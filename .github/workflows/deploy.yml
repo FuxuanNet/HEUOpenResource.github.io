@@ -1,0 +1,56 @@
+name: 部署站点
+
+on:
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 设置 Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # 设置 Python（用于运行 update.py）
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      # 如果 update.py 依赖第三方库，取消注释此步
+      - name: 安装 Python 依赖
+        run: pip install -r requirements.txt
+
+      # 执行项目根目录的 update.py
+      - name: 执行update.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python update.py
+
+      # 安装 Node 依赖
+      - name: 安装依赖
+        run: npm ci
+
+      # 构建 VuePress
+      - name: 构建 VuePress 站点
+        env:
+          NODE_OPTIONS: --max_old_space_size=8192
+        run: npm run docs:build
+
+      # 部署到 GitHub Pages
+      - name: 部署到 GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: gh-pages
+          build_dir: docs/.vuepress/dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
