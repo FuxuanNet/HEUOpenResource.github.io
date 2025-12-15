@@ -72,7 +72,7 @@ export default defineUserConfig({
   theme: plumeTheme({
     /* 添加您的部署域名, 有助于 SEO, 生成 sitemap */
     // hostname: 'https://your_site_url',
-    hostname: 'https://HEUOpenResource.github.io',
+    hostname: 'https://heu.us.kg',
 
     /* 文档仓库配置，用于 editLink */
     docsRepo: 'https://github.com/HEUOpenResource/HEUOpenResource.github.io',
@@ -252,6 +252,12 @@ export default defineUserConfig({
      */
     llmstxt: {
       locale: '/',    // 默认仅为主语言生成 llms 友好内容
+      llmsTxtTemplateGetter: {
+        description: (_, { currentLocale }) => {
+          return currentLocale === '哈尔滨工程大学课程攻略共享计划'
+        },
+        details: '',
+      },  
     }
   }),
 })
