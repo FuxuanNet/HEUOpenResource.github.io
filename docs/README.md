@@ -21,5 +21,6 @@ config:
           link: https://github.com/HEUOpenResource/heu-icicles
           theme: alt
 title: 课程资料
+footer: false
 permalink: /
 ---

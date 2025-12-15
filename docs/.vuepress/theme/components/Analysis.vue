@@ -26,44 +26,48 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted, watch, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  
-  const loaded = ref(false)
-  const route = useRoute()
-  
-  function loadBusuanzi() {
-    if (typeof window === 'undefined') return
-  
-    // 防止重复加载脚本
-    if (!document.getElementById('busuanzi-script')) {
+    import { onMounted, watch, ref, nextTick } from 'vue'
+    import { useRoute } from 'vue-router'
+    
+    const loaded = ref(false)
+    const route = useRoute()
+    
+    function insertBusuanzi() {
+      if (typeof window === 'undefined') return
+    
+      // 删除旧脚本（关键）
+      const oldScript = document.getElementById('busuanzi-script')
+      if (oldScript) {
+        oldScript.remove()
+      }
+    
       const script = document.createElement('script')
       script.id = 'busuanzi-script'
       script.async = true
       script.src = '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
+    
       script.onload = () => {
         loaded.value = true
       }
+    
       document.body.appendChild(script)
-    } else {
-      loaded.value = true
-      // @ts-ignore
-      window.Busuanzi?.fetch()
     }
-  }
-  
-  onMounted(loadBusuanzi)
-  
-  // 路由变化时，重新触发页面统计
-  watch(
-    () => route.fullPath,
-    () => {
-      // @ts-ignore
-      window.Busuanzi?.fetch()
-    }
-  )
-  </script>
-  
+    
+    onMounted(() => {
+      insertBusuanzi()
+    })
+    
+    // 路由切换后重新加载
+    watch(
+      () => route.fullPath,
+      async () => {
+        loaded.value = false
+        await nextTick()        // 等 DOM 更新完成
+        insertBusuanzi()        // 重新扫描 DOM
+      }
+    )
+    </script>
+    
   <style scoped>
   .busuanzi-stats {
     font-size: 14px;

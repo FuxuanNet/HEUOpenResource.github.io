@@ -24,6 +24,15 @@ export default defineUserConfig({
   head: [
     // 配置站点图标
     ['link', { rel: 'icon', type: 'image/png', href: '/avatar.jpg' }],
+    // 统计脚本
+    [
+      'script',
+      {
+        defer: true,
+        src: 'https://analytics.heu.us.kg/tracker.min.js',
+        'data-website-id': '哈尔滨工程大学课程攻略共享计划',
+      },
+    ],
   ],
 
   bundler: webpackBundler({
@@ -183,7 +192,16 @@ export default defineUserConfig({
      * @see https://theme-plume.vuejs.press/guide/features/watermark/
      */
     // watermark: true,
-
+    // watermark: {
+    //   watermarkOptions: {
+    //     contentType: 'image',
+    //     image: '/jgcc.jpg',
+    //     width: 200,
+    //     height: 200,
+    //     imageWidth: 100,
+    //     imageHeight: 100,
+    //   }
+    // },
     /**
      * 评论 comments
      * @see https://theme-plume.vuejs.press/guide/features/comments/
