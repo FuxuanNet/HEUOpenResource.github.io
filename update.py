@@ -66,23 +66,36 @@ def find_readme(path=""):
     return None
 
 
-def get_contributors(path, limit=20):
+def get_contributors(path, max_pages=10):
     url = f"https://api.github.com/repos/{OWNER}/{REPO}/commits"
-    params = {"path": path, "sha": BRANCH, "per_page": limit}
-    resp = requests.get(url, headers=HEADERS, params=params)
-    if resp.status_code != 200:
-        return []
-
     contributors = []
     seen = set()
-    for commit in resp.json():
-        if commit.get("author") and commit["author"].get("login"):
-            name = commit["author"]["login"]
-        else:
-            name = commit["commit"]["author"]["name"]
-        if name and name not in seen:
-            seen.add(name)
-            contributors.append(name)
+
+    for page in range(1, max_pages + 1):
+        params = {
+            "path": path,
+            "sha": BRANCH,
+            "per_page": 100,
+            "page": page,
+        }
+        resp = requests.get(url, headers=HEADERS, params=params)
+        if resp.status_code != 200:
+            break
+
+        commits = resp.json()
+        if not commits:
+            break  # 没有更多了
+
+        for commit in commits:
+            if commit.get("author") and commit["author"].get("login"):
+                name = commit["author"]["login"]
+            else:
+                name = commit["commit"]["author"]["name"]
+
+            if name and name not in seen:
+                seen.add(name)
+                contributors.append(name)
+
     return contributors
 
 
